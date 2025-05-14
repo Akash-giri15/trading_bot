@@ -4,64 +4,73 @@ import argparse
 import sys
 import time
 import numpy as np
-from decimal import Decimal, ROUND_DOWN
+from decimal import Decimal
 from binance.client import Client
 from binance import exceptions
 
 class BasicBot:
     def __init__(self, api_key: str, api_secret: str, testnet: bool = True):
-        # Initialize Binance Futures Testnet client
         self.client = Client(api_key, api_secret, testnet=testnet)
-        # Fetch exchange info for precision rules
         info = self.client.futures_exchange_info()
         self.filters = {f['symbol']: f['filters'] for f in info['symbols']}
-
-        # Configure logger (file + console)
+        
+        # Configure logger (file + console) with idempotent setup
         self.logger = logging.getLogger('BasicBot')
         self.logger.setLevel(logging.INFO)
-        fmt = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        fh = logging.FileHandler('bot.log')
-        fh.setFormatter(fmt)
-        ch = logging.StreamHandler(sys.stdout)
-        ch.setFormatter(fmt)
-        self.logger.addHandler(fh)
-        self.logger.addHandler(ch)
+        if not getattr(self.logger, '_configured', False):
+            fmt = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            fh = logging.FileHandler('bot.log')
+            fh.setFormatter(fmt)
+            ch = logging.StreamHandler(sys.stdout)
+            ch.setFormatter(fmt)
+            self.logger.addHandler(fh)
+            self.logger.addHandler(ch)
+            self.logger._configured = True
         self.logger.info('Initialized BasicBot')
 
     def _adjust_precision(self, symbol: str, value: float, filter_type: str) -> float:
-        # filter_type: 'LOT_SIZE' for quantity, 'PRICE_FILTER' for price
         sym_filters = self.filters.get(symbol.upper(), [])
         for f in sym_filters:
             if f['filterType'] == filter_type:
                 step = Decimal(f['stepSize'] if filter_type == 'LOT_SIZE' else f['tickSize'])
-                val = Decimal(value)
-                # round down to allowed precision
-                quantized = (val // step) * step
-                return float(quantized)
+                quant = (Decimal(value) // step) * step
+                return float(quant)
         return value
+
+    def _check_notional(self, symbol: str, quantity: float, price: float):
+        sym_filters = self.filters.get(symbol.upper(), [])
+        for f in sym_filters:
+            ft = f.get('filterType', '')
+            if ft in ('MIN_NOTIONAL', 'NOTIONAL'):
+                # Determine the correct key for min notional
+                if 'minNotional' in f:
+                    key = 'minNotional'
+                elif 'notional' in f:
+                    key = 'notional'
+                else:
+                    continue
+                min_notional = Decimal(f[key])
+                notional = Decimal(quantity) * Decimal(price)
+                if notional < min_notional:
+                    raise ValueError(
+                        f"Order notional {notional} is below minimum {min_notional}"
+                    )
+                break
 
     def place_order(self, symbol: str, side: str, order_type: str,
                     quantity: float, price: float = None, stop_price: float = None):
-        """
-        Place various orders:
-        - MARKET, LIMIT, STOP_LIMIT on Futures
-        """
         s = symbol.upper()
         qty = self._adjust_precision(s, quantity, 'LOT_SIZE')
         # MARKET
         if order_type == 'MARKET':
-            params = {
-                'symbol': s,
-                'side': side.upper(),
-                'type': 'MARKET',
-                'quantity': qty
-            }
+            params = {'symbol': s, 'side': side.upper(), 'type': 'MARKET', 'quantity': qty}
             endpoint = self.client.futures_create_order
         # LIMIT
         elif order_type == 'LIMIT':
             if price is None:
                 raise ValueError('Price required for LIMIT orders')
             pr = self._adjust_precision(s, price, 'PRICE_FILTER')
+            self._check_notional(s, qty, pr)
             params = {
                 'symbol': s,
                 'side': side.upper(),
@@ -74,9 +83,10 @@ class BasicBot:
         # STOP_LIMIT
         elif order_type == 'STOP_LIMIT':
             if price is None or stop_price is None:
-                raise ValueError('Both stop_price and price required for STOP_LIMIT')
+                raise ValueError('Both price and stop_price required')
             pr = self._adjust_precision(s, price, 'PRICE_FILTER')
             sp = self._adjust_precision(s, stop_price, 'PRICE_FILTER')
+            self._check_notional(s, qty, sp)
             params = {
                 'symbol': s,
                 'side': side.upper(),
@@ -92,15 +102,37 @@ class BasicBot:
 
         try:
             self.logger.info(f"Placing {order_type} order with params: {params}")
-            result = endpoint(**params)
-            self.logger.info(f"Order response: {result}")
-            return result
+            return endpoint(**params)
         except exceptions.BinanceAPIException as e:
             self.logger.error(f"API error: {e.status_code} - {e.message}")
             raise
         except Exception as e:
             self.logger.error(f"Unexpected error: {e}")
             raise
+
+    def execute_twap(self, symbol: str, side: str, total_qty: float,
+                     duration: int, intervals: int):
+        slice_qty = total_qty / intervals
+        delay = duration / intervals
+        results = []
+        self.logger.info(f"Starting TWAP: {intervals} slices, {slice_qty} qty each, every {delay}s")
+        for i in range(intervals):
+            res = self.place_order(symbol, side, 'MARKET', slice_qty)
+            results.append(res)
+            if i < intervals - 1:
+                time.sleep(delay)
+        return results
+
+    def execute_grid(self, symbol: str, side: str, total_qty: float,
+                     lower_price: float, upper_price: float, grids: int):
+        prices = np.linspace(lower_price, upper_price, grids)
+        qty_per_order = total_qty / grids
+        results = []
+        self.logger.info(f"Starting Grid: {grids} levels from {lower_price} to {upper_price}, {qty_per_order} each")
+        for price in prices:
+            res = self.place_order(symbol, side, 'LIMIT', qty_per_order, price=price)
+            results.append(res)
+        return results
 
     def execute_twap(self, symbol: str, side: str, total_qty: float,
                      duration: int, intervals: int):

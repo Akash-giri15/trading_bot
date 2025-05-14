@@ -1,0 +1,35 @@
+2025-05-14 23:30:03,474 - INFO - Initialized BasicBot
+2025-05-14 23:30:03,475 - INFO - Placing MARKET order with params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'MARKET', 'quantity': 0.01}
+2025-05-14 23:30:16,492 - INFO - Initialized BasicBot
+2025-05-14 23:30:16,494 - INFO - Placing MARKET order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'MARKET', 'quantity': 0.01}
+2025-05-14 23:30:58,008 - INFO - Initialized BasicBot
+2025-05-14 23:40:05,786 - INFO - Initialized BasicBot
+2025-05-14 23:40:05,787 - INFO - Placing MARKET order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'MARKET', 'quantity': 0.01}
+2025-05-14 23:40:27,917 - INFO - Initialized BasicBot
+2025-05-14 23:44:15,233 - INFO - Initialized BasicBot
+2025-05-14 23:44:15,234 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'LIMIT', 'price': 103500.0, 'quantity': 0.01, 'timeInForce': 'GTC'}
+2025-05-14 23:44:52,302 - INFO - Initialized BasicBot
+2025-05-14 23:44:52,304 - INFO - Placing STOP_LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'STOP', 'price': 103500.0, 'stopPrice': 104000.0, 'quantity': 0.01, 'timeInForce': 'GTC'}
+2025-05-14 23:45:13,195 - INFO - Initialized BasicBot
+2025-05-14 23:45:13,195 - INFO - Starting TWAP: 5 slices, 0.002 qty each, every 2.0s
+2025-05-14 23:45:13,196 - INFO - Placing MARKET order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'MARKET', 'quantity': 0.002}
+2025-05-14 23:45:16,509 - INFO - Placing MARKET order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'MARKET', 'quantity': 0.002}
+2025-05-14 23:45:19,823 - INFO - Placing MARKET order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'MARKET', 'quantity': 0.002}
+2025-05-14 23:45:23,331 - INFO - Placing MARKET order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'MARKET', 'quantity': 0.002}
+2025-05-14 23:45:26,636 - INFO - Placing MARKET order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'MARKET', 'quantity': 0.002}
+2025-05-14 23:45:58,866 - INFO - Initialized BasicBot
+2025-05-14 23:45:58,871 - INFO - Starting Grid: 5 levels from 103000.0 to 104000.0, 0.002 each
+2025-05-14 23:45:58,872 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'LIMIT', 'price': 103000.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:46:00,178 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'LIMIT', 'price': 103250.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:46:01,147 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'LIMIT', 'price': 103500.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:46:02,120 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'LIMIT', 'price': 103750.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:46:03,307 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'LIMIT', 'price': 104000.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:47:04,123 - INFO - Initialized BasicBot
+2025-05-14 23:47:04,125 - INFO - Starting Grid: 5 levels from 103000.0 to 104000.0, 0.002 each
+2025-05-14 23:47:04,125 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'price': 103000.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:47:04,807 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'price': 103250.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:47:05,795 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'price': 103500.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:47:06,215 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'price': 103750.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:47:07,203 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'SELL', 'type': 'LIMIT', 'price': 104000.0, 'quantity': 0.002, 'timeInForce': 'GTC'}
+2025-05-14 23:47:42,414 - INFO - Initialized BasicBot
+2025-05-14 23:47:42,415 - INFO - Placing LIMIT order with params: {'symbol': 'BTCUSDT', 'side': 'BUY', 'type': 'LIMIT', 'price': 104000.0, 'quantity': 0.01, 'timeInForce': 'GTC'}
